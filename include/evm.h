@@ -131,14 +131,21 @@ struct evm_result {
 
     /// The amount of gas left after the execution.
     ///
-    /// If evm_result::code is not ::EVM_SUCCESS nor ::EVM_REVERT
-    /// the value MUST be 0.
+    /// The value is valid only if evm_result::code is ::EVM_SUCCESS
+    /// or ::EVM_REVERT. In other cases all provided gas is assumed to have been
+    /// used.
     int64_t gas_left;
 
     /// The reference to output data.
     ///
     /// The output contains data coming from RETURN opcode (iff evm_result::code
-    /// field is ::EVM_SUCCESS) or from REVERT opcode.
+    /// field is ::EVM_SUCCESS) or from REVERT opcode (iff evm_result::code
+    /// field is ::EVM_REVERT).
+    ///
+    /// In case the evm_result::code field signals
+    /// a failure the output MAY contain optional explanation of the failure
+    /// for debugging or tracing purposes. In case the explanation is provided
+    /// and contains human-readable text then UTF-8 encoding SHOULD be used.
     ///
     /// The memory containing the output data is owned by EVM and has to be
     /// freed with evm_result::release().
@@ -187,7 +194,6 @@ struct evm_result {
 enum evm_query_key {
     EVM_CODE_BY_ADDRESS = 10, ///< Code by an address for EXTCODECOPY.
     EVM_CODE_SIZE = 11,       ///< Code size by an address for EXTCODESIZE.
-    EVM_BALANCE = 12,         ///< Balance of a given address for BALANCE.
     EVM_ACCOUNT_EXISTS = 14,  ///< Check if an account exists.
 };
 
@@ -234,9 +240,6 @@ union evm_variant {
 /// - ::EVM_CODE_SIZE
 ///   @result evm_variant::int64      The appropriate code size for the given address or 0 if not found.
 ///
-/// - ::EVM_BALANCE
-///   @result evm_variant::uint256be  The appropriate balance for the given address or 0 if not found.
-///
 /// - ::EVM_ACCOUNT_EXISTS
 ///   @result evm_variant::int64      1 if exists, 0 if not.
 ///
@@ -278,6 +281,18 @@ typedef void (*evm_set_storage_fn)(struct evm_env* env,
                                    const struct evm_uint160be* address,
                                    const struct evm_uint256be* key,
                                    const struct evm_uint256be* value);
+
+/// Get balance callback function.
+///
+/// This callback function is used by an EVM to query the balance of the given
+/// address.
+/// @param[out] result   The returned balance value.
+/// @param      env      Pointer to execution environment managed by the host
+///                      application.
+/// @param      address  The address.
+typedef void (*evm_get_balance_fn)(struct evm_uint256be* result,
+                                   struct evm_env* env,
+                                   const struct evm_uint160be* address);
 
 /// Selfdestruct callback function.
 ///
@@ -327,10 +342,13 @@ typedef void (*evm_call_fn)(
 /// realisation of OOP interface (only virtual methods, no data).
 /// Host implementations SHOULD create constant singletons of this (similar
 /// to vtables) to lower the maintenance and memory management cost.
+///
+/// @todo Merge evm_host with evm_env?
 struct evm_host {
     evm_query_state_fn query;
     evm_get_storage_fn get_storage;
     evm_set_storage_fn set_storage;
+    evm_get_balance_fn get_balance;
     evm_selfdestruct_fn selfdestruct;
     evm_call_fn call;
     evm_get_tx_context_fn get_tx_context;
