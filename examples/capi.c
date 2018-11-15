@@ -1,4 +1,3 @@
-#include <inttypes.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -152,8 +151,8 @@ int main(int argc, char *argv[]) {
     if (result.status_code != EVM_SUCCESS) {
       printf("  EVM execution failure: %d\n", result.status_code);
     } else {
-        printf("  Gas used: %" PRId64 "\n", gas - result.gas_left);
-        printf("  Gas left: %" PRId64 "\n", result.gas_left);
+        printf("  Gas used: %ld\n", gas - result.gas_left);
+        printf("  Gas left: %ld\n", result.gas_left);
         printf("  Output size: %zd\n", result.output_size);
 
         printf("  Output: ");
