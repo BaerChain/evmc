@@ -69,8 +69,8 @@ enum evm_flags {
 /// The message describing an EVM call,
 /// including a zero-depth calls from a transaction origin.
 struct evm_message {
-    struct evm_address destination;  ///< The destination of the message.
-    struct evm_address sender;       ///< The sender of the message.
+    struct evm_address address;  ///< The destination of the message.
+    struct evm_address sender;   ///< The sender of the message.
 
     /// The amount of Ether transferred with the message.
     struct evm_uint256be value;
@@ -78,11 +78,10 @@ struct evm_message {
     /// The message input data.
     ///
     /// This MAY be NULL.
-    const uint8_t* input_data;
-
+    const uint8_t* input;
     /// The size of the message input data.
     ///
-    /// If input_data is NULL this MUST be 0.
+    /// If input is NULL this MUST be 0.
     size_t input_size;
 
     /// The optional hash of the code of the destination account.
@@ -95,8 +94,8 @@ struct evm_message {
     /// The kind of the call. For zero-depth calls ::EVM_CALL SHOULD be used.
     enum evm_call_kind kind;
 
-    /// Additional flags modifying the call execution behavior.
-    /// In the current version the only valid values are ::EVM_STATIC or 0.
+    ///< Additional flags modifying the call execution behavior.
+    ///< In the current version the only valid values are ::EVM_STATIC or 0.
     uint32_t flags;
 };
 
@@ -149,6 +148,8 @@ enum evm_status_code {
     EVM_STACK_OVERFLOW = 5,
     EVM_STACK_UNDERFLOW = 6,
     EVM_REVERT = 7,                ///< Execution terminated with REVERT opcode.
+    /// Tried to execute an operation which is restricted in static mode.
+    EVM_STATIC_MODE_ERROR = 8,
 
     /// The EVM rejected the execution of the given code or message.
     ///
@@ -199,7 +200,9 @@ struct evm_result {
     /// freed with evm_result::release().
     ///
     /// This MAY be NULL.
-    const uint8_t* output_data;
+    ///
+    /// @todo Inconsistent name: output_data vs msg.input.
+    uint8_t const* output_data;
 
     /// The size of the output data.
     ///
