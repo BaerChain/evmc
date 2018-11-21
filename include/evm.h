@@ -69,8 +69,8 @@ enum evm_flags {
 /// The message describing an EVM call,
 /// including a zero-depth calls from a transaction origin.
 struct evm_message {
-    struct evm_address destination;  ///< The destination of the message.
-    struct evm_address sender;       ///< The sender of the message.
+    struct evm_address address;  ///< The destination of the message.
+    struct evm_address sender;   ///< The sender of the message.
 
     /// The amount of Ether transferred with the message.
     struct evm_uint256be value;
@@ -148,6 +148,8 @@ enum evm_status_code {
     EVM_STACK_OVERFLOW = 5,
     EVM_STACK_UNDERFLOW = 6,
     EVM_REVERT = 7,                ///< Execution terminated with REVERT opcode.
+    /// Tried to execute an operation which is restricted in static mode.
+    EVM_STATIC_MODE_ERROR = 8,
 
     /// The EVM rejected the execution of the given code or message.
     ///
