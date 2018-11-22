@@ -388,7 +388,7 @@ typedef void (*evm_emit_log_fn)(struct evm_context* context,
 ///                     initialize all expected fields of the structure.
 /// @param      context The pointer to the Host execution context.
 ///                     @see ::evm_context.
-/// @param      msg     Call parameters.
+/// @param      msg     Call parameters. @see ::evm_message.
 typedef void (*evm_call_fn)(struct evm_result* result,
                             struct evm_context* context,
                             const struct evm_message* msg);
@@ -474,16 +474,9 @@ enum evm_revision {
 /// @param context     The pointer to the Host execution context to be passed
 ///                    to callback functions. @see ::evm_context.
 /// @param rev         Requested EVM specification revision.
-/// @param code_hash   A hash of the bytecode, usually Keccak. The EVM uses it
-///                    as the code identifier. A EVM implementation is able to
-///                    hash the code itself if it requires it, but the host
-///                    application usually has the hash already.
+/// @param msg         Call parameters. @see ::evm_message.
 /// @param code        Reference to the bytecode to be executed.
 /// @param code_size   The length of the bytecode.
-/// @param gas         Gas for execution. Min 0, max 2^63-1.
-/// @param input       Reference to the input data.
-/// @param input_size  The size of the input data.
-/// @param value       Call value.
 /// @return            All execution results.
 typedef struct evm_result (*evm_execute_fn)(struct evm_instance* instance,
                                             struct evm_context* context,
@@ -492,6 +485,36 @@ typedef struct evm_result (*evm_execute_fn)(struct evm_instance* instance,
                                             uint8_t const* code,
                                             size_t code_size);
 
+
+/// Status of a code in VM. Useful for JIT-like implementations.
+enum evm_code_status {
+    /// The code is uknown to the VM.
+    EVM_UNKNOWN,
+
+    /// The code has been compiled and is available in memory.
+    EVM_READY,
+
+    /// The compiled version of the code is available in on-disk cache.
+    EVM_CACHED,
+};
+
+
+/// Get information the status of the code in the VM.
+typedef enum evm_code_status
+(*evm_get_code_status_fn)(struct evm_instance* instance,
+                          enum evm_revision rev,
+                          uint32_t flags,
+                          struct evm_uint256be code_hash);
+
+/// Request preparation of the code for faster execution. It is not required
+/// to execute the code but allows compilation of the code ahead of time in
+/// JIT-like VMs.
+typedef void (*evm_prepare_code_fn)(struct evm_instance* instance,
+                                    enum evm_revision rev,
+                                    uint32_t flags,
+                                    struct evm_uint256be code_hash,
+                                    uint8_t const* code,
+                                    size_t code_size);
 
 /// The EVM instance.
 ///
@@ -511,6 +534,16 @@ struct evm_instance {
 
     /// Pointer to function executing a code by the EVM instance.
     evm_execute_fn execute;
+
+    /// Optional pointer to function returning a status of a code.
+    ///
+    /// If the VM does not support this feature the pointer can be NULL.
+    evm_get_code_status_fn get_code_status;
+
+    /// Optional pointer to function compiling  a code.
+    ///
+    /// If the VM does not support this feature the pointer can be NULL.
+    evm_prepare_code_fn prepare_code;
 
     /// Optional pointer to function modifying VM's options.
     ///
