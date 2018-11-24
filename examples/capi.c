@@ -66,14 +66,6 @@ static void get_balance(struct evm_uint256be* result,
     *result = balance(context, address);
 }
 
-static size_t get_code_size(struct evm_context* context, const struct evm_address* address)
-{
-    printf("EVM-C: CODESIZE @");
-    print_address(address);
-    printf("\n");
-    return 0;
-}
-
 static size_t get_code(const uint8_t** code,
                        struct evm_context* context,
                        const struct evm_address* address)
@@ -129,7 +121,6 @@ static const struct evm_context_fn_table ctx_fn_table = {
     get_storage,
     set_storage,
     get_balance,
-    get_code_size,
     get_code,
     selfdestruct,
     call,
