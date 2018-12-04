@@ -9,13 +9,10 @@ jobs:
       - run:
           name: "Configure"
           working_directory: ~/build
-          command: cmake ../project -DEVMC_BUILD_EXAMPLES=ON -DEVMC_BUILD_TESTS=ON
+          command: cmake ../project
       - run:
           name: "Build"
           command: cmake --build ~/build
-      - run:
-          name: "Test"
-          command: cmake --build ~/build --target test
 
   test-docs:
     docker:
