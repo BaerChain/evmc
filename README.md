@@ -1,65 +1,83 @@
-# EVMC
+# Cable
 
-[![chat: on gitter][gitter badge]][Gitter]
 [![readme style: standard][readme style standard badge]][standard readme]
 
-> Ethereum Client-VM Connector API
+> Cable: CMake Bootstrap Library
 
-The EVMC is the low-level ABI between Ethereum Virtual Machines (EVMs) and 
-Ethereum Clients. On the EVM-side it supports classic EVM1 and [eWASM].
-On the Client-side it defines the interface for EVM implementations 
-to access Ethereum environment and state.
+Cable is a set of CMake modules and scripts containing common patterns used
+in CMake-based C++ projects. The design goal is to be pragmatic rather than
+generic so the number of provided options is minimal. The Cable modules are
+independent and it is easy to use them individually.
+
+
+## Table of Contents
+
+- [Install](#install)
+- [Usage](#usage)
+- [Maintainer](#maintainer)
+- [License](#license)
+
+
+## Install
+
+### As git subtree
+
+Adding a dependency project as a [git subtree] is just a copy of the source code
+done in a bit more systematic way.
+
+If you are not familiar with managing dependencies with git subtree read the
+[Git subtree: the alternative to Git submodule][git subtree tutorial].
+
+```sh
+git remote add cable https://github.com/ethereum/cable
+git subtree add --prefix cmake/cable cable master --squash
+```
+
+### As git submodule
+
+Include the Cable library as [git submodule] in your project. The suggested
+submodule location is `cmake/cable` relative to your project root directory.
+
+```sh
+git submodule add https://github.com/ethereum/cable cmake/cable
+```
 
 ## Usage
 
-Please visit the [documentation].
+Cable contains the `bootstrap.cmake` file that initializes the library.
+Start by including this file in your main `CMakeLists.txt` from the Cable 
+submodule/subtree or any other location. The `bootstrap.cmake` must be included 
+before the `project()` command. After that, you can include and use other
+Cable modules.
 
-## Related projects
+### Example
 
-### EVMs
+```cmake
+cmake_minimum_required(VERSION 3.5)
 
-- [aleth-interpreter]
-- [evmjit]
-- [Hera]
+include(cmake/cable/bootstrap.cmake)
+include(CableBuildType)
 
-### Clients
+project(tothemoon)
 
-- [aleth]
-- [nim-evmc]
-- [go-ethereum] (in progress)
-- [pyevm] (in progress)
-- [pyethereum] (abandoned)
+cable_set_build_type(DEFAULT RelWithDebInfo CONFIGURATION_TYPES Debug Release RelWithDebInfo)
+```
 
-## Contribute
 
-[![chat: on gitter][gitter badge]][Gitter]
+## Maintainer
 
-Talk with us on the [EVMC Gitter chat][Gitter].
-
-## Maintainers
-
-- Alex Beregszaszi [@axic]
-- Paweł Bylica [@chfast]
+Paweł Bylica [@chfast]
 
 ## License
 
-Licensed under the [MIT License](LICENSE.md).
+Licensed under the [Apache License, Version 2.0].
 
 
-[@axic]: https://github.com/axic
 [@chfast]: https://github.com/chfast
-[documentation]: https://ethereum.github.io/evmc
-[eWASM]: https://github.com/ewasm/design#ethereum-flavored-webassembly-ewasm-design
-[evmjit]: https://github.com/ethereum/evmjit
-[Hera]: https://github.com/ewasm/hera
-[Gitter]: https://gitter.im/ethereum/evmc
-[aleth-interpreter]: https://github.com/ethereum/cpp-ethereum/tree/develop/libaleth-interpreter
-[aleth]: https://github.com/ethereum/cpp-ethereum
-[nim-evmc]: https://github.com/status-im/nim-evmc
-[go-ethereum]: https://github.com/ethereum/go-ethereum/pull/17050
-[pyevm]: https://github.com/ethereum/py-evm
-[pyethereum]: https://github.com/ethereum/pyethereum/pull/406
+[Apache License, Version 2.0]: LICENSE
+[git submodule]: https://git-scm.com/book/en/v2/Git-Tools-Submodules
+[git subtree]: https://github.com/git/git/blob/master/contrib/subtree/git-subtree.txt
+[git subtree tutorial]: https://www.atlassian.com/blog/git/alternatives-to-git-submodule-git-subtree
 [standard readme]: https://github.com/RichardLitt/standard-readme
 
-[gitter badge]: https://img.shields.io/gitter/room/ethereum/evmc.svg?style=flat-square
 [readme style standard badge]: https://img.shields.io/badge/readme%20style-standard-brightgreen.svg?style=flat-square
