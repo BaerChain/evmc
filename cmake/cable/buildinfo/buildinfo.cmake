@@ -10,13 +10,16 @@ string(TIMESTAMP TIMESTAMP)
 
 # Read the git info from a file. The gitinfo is suppose to update the file
 # only if the information has changed.
-file(READ ${BINARY_DIR}/gitinfo.txt GIT_INFO)
+file(STRINGS ${OUTPUT_DIR}/gitinfo.txt gitinfo)
+list(GET gitinfo 0 describe)
+list(GET gitinfo 1 GIT_BRANCH)
+list(GET gitinfo 2 GIT_ORIGIN_URL)
 
 # The output of `git describe --always --long --tags --match=v*`.
-string(REGEX MATCH "(v(.+)-([0-9]+)-g)?([0-9a-f]+)(-dirty)?" match "${GIT_INFO}")
+string(REGEX MATCH "(v(.+)-([0-9]+)-g)?([0-9a-f]+)(-dirty)?" match "${describe}")
 
 if(NOT match)
-    message(WARNING "Cannot parse git describe: ${GIT_INFO}")
+    message(WARNING "Cannot parse git describe: ${describe}")
 endif()
 
 set(GIT_LATEST_PROJECT_VERSION ${CMAKE_MATCH_2})
@@ -48,8 +51,15 @@ else()
     set(PROJECT_VERSION "${PROJECT_VERSION}${version_commit}")
 endif()
 
+if(PROJECT_VERSION MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$")
+    set(PROJECT_VERSION_IS_PRERELEASE false)
+else()
+    set(PROJECT_VERSION_IS_PRERELEASE true)
+    set(prerelease_comment " (prerelease)")
+endif()
+
 message(
-    "       Project Version:  ${PROJECT_VERSION}\n"
+    "       Project Version:  ${PROJECT_VERSION}${prerelease_comment}\n"
     "       System Name:      ${SYSTEM_NAME}\n"
     "       System Processor: ${SYSTEM_PROCESSOR}\n"
     "       Compiler ID:      ${COMPILER_ID}\n"
@@ -59,4 +69,6 @@ message(
     "       Timestamp:        ${TIMESTAMP}"
 )
 
-configure_file(${CMAKE_CURRENT_LIST_DIR}/buildinfo.c.in ${BINARY_DIR}/${NAME}.c)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/buildinfo.c.in ${OUTPUT_DIR}/buildinfo.c)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/buildinfo.sh.in ${OUTPUT_DIR}/buildinfo.sh)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/buildinfo.ps1.in ${OUTPUT_DIR}/buildinfo.ps1)
