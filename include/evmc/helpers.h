@@ -18,6 +18,14 @@
 #include <evmc/evmc.h>
 
 /**
+ * Returns true if the instance has a compatible ABI version.
+ */
+static inline int evmc_is_abi_compatible(struct evmc_instance *instance)
+{
+    return instance->abi_version == EVMC_ABI_VERSION;
+}
+
+/**
  * Destroys the VM instance.
  *
  * @see evmc_destroy_fn
@@ -39,21 +47,6 @@ static inline int evmc_set_option(struct evmc_instance* instance,
     if (instance->set_option)
         return instance->set_option(instance, name, value);
     return 0;
-}
-
-/**
- * Executes code in the VM instance.
- *
- * @see evmc_execute_fn.
- */
-static inline struct evmc_result evmc_execute(struct evmc_instance* instance,
-                                              struct evmc_context* context,
-                                              enum evmc_revision rev,
-                                              const struct evmc_message* msg,
-                                              uint8_t const* code,
-                                              size_t code_size)
-{
-    return instance->execute(instance, context, rev, msg, code, code_size);
 }
 
 /**
