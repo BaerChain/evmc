@@ -18,14 +18,6 @@
 #include <evmc/evmc.h>
 
 /**
- * Returns true if the instance has a compatible ABI version.
- */
-static inline int evmc_is_abi_compatible(struct evmc_instance *instance)
-{
-    return instance->abi_version == EVMC_ABI_VERSION;
-}
-
-/**
  * Destroys the VM instance.
  *
  * @see evmc_destroy_fn
@@ -47,6 +39,19 @@ static inline int evmc_set_option(struct evmc_instance* instance,
     if (instance->set_option)
         return instance->set_option(instance, name, value);
     return 0;
+}
+
+/**
+ * Sets the tracer callback for the VM instance, if the feature is supported by the VM.
+ *
+ * @see evmc_set_tracer_fn
+ */
+static inline void evmc_set_tracer(struct evmc_instance* instance,
+                                   evmc_trace_callback callback,
+                                   struct evmc_tracer_context* context)
+{
+    if (instance->set_tracer)
+        instance->set_tracer(instance, callback, context);
 }
 
 /**
