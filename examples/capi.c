@@ -167,8 +167,8 @@ static const struct evmc_context_fn_table ctx_fn_table = {
 int main()
 {
     struct evmc_instance* vm = evmc_create_examplevm();
-    if (!evmc_is_abi_compatible(vm))
-        return 1;
+    if (vm->abi_version != EVMC_ABI_VERSION)
+        return 1;  // Incompatible ABI version.
 
     const uint8_t code[] = "Place some EVM bytecode here";
     const size_t code_size = sizeof(code);
@@ -190,7 +190,7 @@ int main()
     msg.gas = gas;
     msg.depth = 0;
 
-    struct evmc_result result = vm->execute(vm, &ctx, EVMC_HOMESTEAD, &msg, code, code_size);
+    struct evmc_result result = evmc_execute(vm, &ctx, EVMC_HOMESTEAD, &msg, code, code_size);
 
     printf("Execution result:\n");
     if (result.status_code != EVMC_SUCCESS)
