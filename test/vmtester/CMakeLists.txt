@@ -9,7 +9,17 @@ find_package(CLI11)
 
 add_executable(evmc-vmtester vmtester.hpp vmtester.cpp tests.cpp)
 set_target_properties(evmc-vmtester PROPERTIES RUNTIME_OUTPUT_DIRECTORY ..)
-target_link_libraries(evmc-vmtester PRIVATE evmc loader GTest::gtest CLI11::CLI11)
+
+target_link_libraries(
+    evmc-vmtester
+    PRIVATE
+    evmc
+    loader
+    GTest::gtest
+    CLI11::CLI11
+)
+
+set_target_properties(evmc-vmtester PROPERTIES RUNTIME_OUTPUT_DIRECTORY ..)
 
 install(TARGETS evmc-vmtester RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
