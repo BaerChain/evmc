@@ -118,12 +118,13 @@ static void selfdestruct(struct evmc_context* context,
     printf("\n");
 }
 
-static struct evmc_result call(struct evmc_context* context, const struct evmc_message* msg)
+static void call(struct evmc_result* result,
+                 struct evmc_context* context,
+                 const struct evmc_message* msg)
 {
     (void)context;
     printf("EVM-C: CALL (depth: %d)\n", msg->depth);
-    struct evmc_result result = {.status_code = EVMC_FAILURE};
-    return result;
+    result->status_code = EVMC_FAILURE;
 }
 
 static void get_tx_context(struct evmc_tx_context* result, struct evmc_context* context)
