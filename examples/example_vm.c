@@ -1,4 +1,8 @@
-#include "examplevm.h"
+/* EVMC: Ethereum Client-VM Connector API.
+ * Copyright 2018 The EVMC Authors.
+ * Licensed under the Apache License, Version 2.0. See the LICENSE file.
+ */
+#include "example_vm.h"
 
 #include <limits.h>
 #include <stdio.h>
@@ -11,7 +15,7 @@
 #define PROJECT_VERSION 0.0.0
 #endif
 
-struct examplevm
+struct example_vm
 {
     struct evmc_instance instance;
     int verbose;
@@ -29,7 +33,7 @@ static void destroy(struct evmc_instance* evm)
 /// VMs are allowed to omit this function implementation.
 static int set_option(struct evmc_instance* instance, char const* name, char const* value)
 {
-    struct examplevm* vm = (struct examplevm*)instance;
+    struct example_vm* vm = (struct example_vm*)instance;
     if (strcmp(name, "verbose") == 0)
     {
         long int v = strtol(value, NULL, 0);
@@ -71,7 +75,7 @@ static struct evmc_result execute(struct evmc_instance* instance,
         return ret;
     }
 
-    struct examplevm* vm = (struct examplevm*)instance;
+    struct example_vm* vm = (struct example_vm*)instance;
 
     // Simulate executing by checking for some code patterns.
     // Solidity inline assembly is used in the examples instead of EVM bytecode.
@@ -104,9 +108,9 @@ static struct evmc_result execute(struct evmc_instance* instance,
     {
         struct evmc_uint256be value;
         const struct evmc_uint256be index = {{0}};
-        context->fn_table->get_storage(&value, context, &msg->destination, &index);
+        context->host->get_storage(&value, context, &msg->destination, &index);
         value.bytes[31]++;
-        context->fn_table->set_storage(context, &msg->destination, &index, &value);
+        context->host->set_storage(context, &msg->destination, &index, &value);
         ret.status_code = EVMC_SUCCESS;
         return ret;
     }
@@ -125,23 +129,23 @@ static void set_tracer(struct evmc_instance* instance,
                        evmc_trace_callback callback,
                        struct evmc_tracer_context* context)
 {
-    struct examplevm* vm = (struct examplevm*)instance;
+    struct example_vm* vm = (struct example_vm*)instance;
     vm->trace_callback = callback;
     vm->tracer_context = context;
 }
 
-struct evmc_instance* evmc_create_examplevm()
+struct evmc_instance* evmc_create_example_vm()
 {
     struct evmc_instance init = {
         .abi_version = EVMC_ABI_VERSION,
-        .name = "examplevm",
+        .name = "example_vm",
         .version = STR(PROJECT_VERSION),
         .destroy = destroy,
         .execute = execute,
         .set_option = set_option,
         .set_tracer = set_tracer,
     };
-    struct examplevm* vm = calloc(1, sizeof(struct examplevm));
+    struct example_vm* vm = calloc(1, sizeof(struct example_vm));
     struct evmc_instance* interface = &vm->instance;
     memcpy(interface, &init, sizeof(init));
     return interface;
