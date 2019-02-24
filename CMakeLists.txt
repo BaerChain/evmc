@@ -17,14 +17,16 @@ include(cmake/cable/bootstrap.cmake)
 include(CableBuildType)
 include(CableCompilerSettings)
 include(CMakePackageConfigHelpers)
-include(HunterGate)
 include(GNUInstallDirs)
-include(defaults/HunterCacheServers)
 
-include(HunterConfig)
+if(EVMC_TESTING)
+	include(HunterGate)
+	include(HunterConfig)
+	include(defaults/HunterCacheServers)
+endif()
 
 project(evmc)
-set(PROJECT_VERSION 6.1.0-dev)
+set(PROJECT_VERSION 6.0.0)
 
 cable_set_build_type(DEFAULT Release CONFIGURATION_TYPES Debug Release)
 
