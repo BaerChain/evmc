@@ -3,7 +3,7 @@ jobs:
 
   lint:
     docker:
-    - image: ethereum/cpp-build-env:7
+    - image: ethereum/cpp-build-env
     steps:
     - checkout
     - run:
@@ -18,15 +18,15 @@ jobs:
           sudo pip3 install codespell
           codespell --quiet-level=4 --ignore-words=./.codespell-whitelist
 
-  build-cxx11: &build
+  build: &build
     docker:
-      - image: ethereum/cpp-build-env:7
+      - image: ethereum/cpp-build-env
     steps:
       - checkout
       - run:
           name: "Configure"
           working_directory: ~/build
-          command: cmake ../project -DCMAKE_INSTALL_PREFIX=~/install -DBUILD_SHARED_LIBS=ON -DEVMC_EXAMPLES=ON -DEVMC_TESTING=ON $CMAKE_OPTIONS
+          command: cmake ../project -DCMAKE_INSTALL_PREFIX=~/install -DBUILD_SHARED_LIBS=ON -DEVMC_EXAMPLES=ON -DEVMC_TESTING=ON
       - run:
           name: "Build"
           command: cmake --build ~/build
@@ -63,19 +63,11 @@ jobs:
           name: "Run evmc-vmtester libevmc-example-vm.so"
           command: ~/install/bin/evmc-vmtester ~/install/lib/libevmc-example-vm.so
 
-  build-cxx14:
+  build-clang-3.8:
     <<: *build
     environment:
       CC: clang-3.8
       CXX: clang++-3.8
-      CMAKE_OPTIONS: -DTOOLCHAIN=cxx14-pic
-
-  build-cxx17:
-    <<: *build
-    environment:
-      CC: gcc-6
-      CXX: g++-6
-      CMAKE_OPTIONS: -DTOOLCHAIN=cxx17-pic
 
   test-docs:
     docker:
@@ -130,21 +122,14 @@ jobs:
       - image: circleci/golang:1.9
     steps: *bindings-go-steps
 
-  bindings-go-1.11:
-    docker:
-      - image: circleci/golang:1.11
-    steps: *bindings-go-steps
-
 
 workflows:
   version: 2
   evmc:
     jobs:
       - lint
-      - build-cxx11
-      - build-cxx14
-      - build-cxx17
-      - bindings-go-1.11
+      - build
+      - build-clang-3.8
       - bindings-go-1.10
       - bindings-go-1.9
       - test-docs
