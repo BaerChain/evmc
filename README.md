@@ -12,9 +12,6 @@ to access Ethereum environment and state.
 
 ## Usage
 
-### Documentation
-
-Please visit the [documentation].
 
 ### Languages support
 
@@ -26,29 +23,6 @@ Please visit the [documentation].
 
 [^1]: C++ support is provided by C headers and some optional C++ helpers.
 
-## Related projects
-
-### EVMs
-
-- [aleth-interpreter]
-- [evmjit]
-- [Hera]
-
-### Clients
-
-- [aleth]
-- [nim-evmc]
-- [go-ethereum] (in progress)
-- [pyevm] (in progress)
-- [pyethereum] (abandoned)
-
-
-## Maintainers
-
-- Alex Beregszaszi [@axic]
-- Paweł Bylica [@chfast]
-
-See also the list of [EVMC Authors](AUTHORS.md).
 
 ## Contributing
 
@@ -73,17 +47,9 @@ Licensed under the [MIT License](LICENSE).
 6. Start new release series: `bumpversion --allow-dirty --no-tag minor`.
 
 
-[@axic]: https://github.com/axic
-[@chfast]: https://github.com/chfast
-[documentation]: https://ethereum.github.io/evmc
 [ewasm]: https://github.com/ewasm/design
-[evmjit]: https://github.com/ethereum/evmjit
-[Hera]: https://github.com/ewasm/hera
 [Gitter]: https://gitter.im/ethereum/evmc
-[aleth-interpreter]: https://github.com/ethereum/aleth/tree/master/libaleth-interpreter
-[aleth]: https://github.com/ethereum/aleth
 [nim-evmc]: https://github.com/status-im/nim-evmc
-[go-ethereum]: https://github.com/ethereum/go-ethereum/pull/17050
 [pyevm]: https://github.com/ethereum/py-evm
 [pyethereum]: https://github.com/ethereum/pyethereum/pull/406
 [standard readme]: https://github.com/RichardLitt/standard-readme
